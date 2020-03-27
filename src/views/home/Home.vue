@@ -30,6 +30,7 @@ import FeatureView from './childComps/FeatureView'
 
 //导入网络请求封装好的函数
 import {getHomeMultidata, getHomeGoods} from 'network/home'
+import {debounce} from 'common/utils'
 
 export default {
     name: "Home",
@@ -72,6 +73,16 @@ export default {
         this.getHomeGoods('pop')
         this.getHomeGoods('new')
         this.getHomeGoods('sell')
+
+        
+    },
+    mounted() {//为确保this.$refs.scroll已经有值，将该刷新步骤放到mounted中
+        //监听goodsitem中图片加载完成
+        //通过防抖函数避免过于频繁的刷新
+        const refresh = debounce(this.$refs.scroll.refresh, 100)
+        this.$bus.$on('itemImgLoad', () => {
+            refresh()
+        })
     },
     methods: {
         tabClick(index) {
