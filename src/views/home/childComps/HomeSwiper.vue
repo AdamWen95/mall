@@ -2,7 +2,7 @@
     <swiper>
         <swiper-item v-for="(item, index) in banners" :key="index"> 
             <a :href="item.link">
-                <img :src="item.image" alt="">
+                <img :src="item.image" alt="" @load="imgLoad">
             </a>
         </swiper-item>
     </swiper>
@@ -18,6 +18,22 @@ export default {
             type: Array,
             defualt() {
                 return []
+            }
+        }
+    },
+    data() {
+        return {
+            //图片是否加载--->轮播图已加载事件发射一次就够了
+            isLoad: false
+        }
+    },
+    methods: {
+        //发射轮播图片加载完的事件
+        imgLoad() {
+            if (!this.isLoad) {
+               this.$emit('swiperImgLoad');
+               //防止发射第二次
+               this.isLoad = true
             }
         }
     },

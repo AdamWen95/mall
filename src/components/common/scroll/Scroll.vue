@@ -61,6 +61,10 @@ export default {
         //需要结束pullUp，不然不能进行下一次pullUp
         finishPullUp() {
             this.scroll && this.scroll.finishPullUp()
+        },
+        //获取滚动的位置
+        getScrollY() {
+            return this.scroll ? this.scroll.y : 0;
         }
     },
 }
