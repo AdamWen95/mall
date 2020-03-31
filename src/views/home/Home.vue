@@ -13,7 +13,7 @@
     </scroll>
 
 <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
-    
+
 </div>
 </template>
 
@@ -79,7 +79,7 @@ export default {
         this.getHomeGoods('new')
         this.getHomeGoods('sell')
 
-        
+
     },
     mounted() {//为确保this.$refs.scroll已经有值，将该刷新步骤放到mounted中
         //监听goodsitem中图片加载完成
@@ -91,8 +91,9 @@ export default {
     },
     //回来时定位到离开前的位置
     activated() {
+      //先refresh，再scrollTo，不然会导致有时候页面滚回顶部
+        this.$refs.scroll.refresh();
         this.$refs.scroll.scrollTo(0, this.saveY, 0);
-        this.$refs.scroll.refresh()
     },
     //离开时记录滚动到的位置
     deactivated() {
@@ -108,6 +109,7 @@ export default {
                 case 2: this.currentType = 'sell';
                 break;
             }
+            //两个标签栏的选中标签保持一致
             this.$refs.tabControl1.currentIndex = index;
             this.$refs.tabControl2.currentIndex = index;
         },
@@ -138,6 +140,7 @@ export default {
             this.isShowBackTop = (-position.y) > 1000;
             //2.决定tab-control是否吸顶
             this.isTabFixed = (-position.y) >= this.tabOffsetTop;
+            // console.log(position)
         },
         loadMore() {
             this.getHomeGoods(this.currentType)

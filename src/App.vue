@@ -1,5 +1,6 @@
 <template>
   <div id="app">
+    <!-- exclude中用的名称是组件中的name -->
     <keep-alive exclude="Detail">
       <router-view></router-view>
     </keep-alive>

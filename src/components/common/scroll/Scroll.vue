@@ -64,6 +64,7 @@ export default {
         },
         //获取滚动的位置
         getScrollY() {
+          //scroll自带坐标属性x, y
             return this.scroll ? this.scroll.y : 0;
         }
     },
