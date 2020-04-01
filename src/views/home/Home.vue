@@ -33,6 +33,7 @@ import FeatureView from './childComps/FeatureView'
 //导入网络请求等封装好的函数
 import {getHomeMultidata, getHomeGoods} from 'network/home'
 import {debounce} from 'common/utils'
+import {itemListenerMixin} from 'common/mixin'
 
 export default {
     name: "Home",
@@ -51,9 +52,10 @@ export default {
             isShowBackTop: false,
             isTabFixed: false,
             tabOffsetTop: 0,
-            saveY: 0
+            saveY: 0,
         }
     },
+    mixins: [itemListenerMixin],
     components: {
         NavBar,
         TabControl,
@@ -84,10 +86,13 @@ export default {
     mounted() {//为确保this.$refs.scroll已经有值，将该刷新步骤放到mounted中
         //监听goodsitem中图片加载完成
         //通过防抖函数避免过于频繁的刷新
-        const refresh = debounce(this.$refs.scroll.refresh, 100)
-        this.$bus.$on('itemImgLoad', () => {
-            refresh()
-        })
+        // const refresh = debounce(this.$refs.scroll.refresh, 100)
+        //对监听的事件进行保存
+        // this.itemImgListener = () => {
+        //     refresh()
+        // }
+        // this.$bus.$on('itemImgLoad', this.itemImgListener)
+        //使用混入的代码执行
     },
     //回来时定位到离开前的位置
     activated() {
@@ -98,6 +103,8 @@ export default {
     //离开时记录滚动到的位置
     deactivated() {
         this.saveY = this.$refs.scroll.getScrollY();
+        //取消全局事件的监听（图片加载完再刷新滚动），因为详情页也有goodsList也会发射图片加载完的事件，不需要在home中为详情页的事件响应
+        this.$bus.$off('itemImgLoad', this.itemImgListener)
     },
     methods: {
         tabClick(index) {

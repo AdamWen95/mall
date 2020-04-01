@@ -1,6 +1,7 @@
 <template>
     <div class="goods-item" @click="itemClick">
-        <img :src="goodsItem.show.img" alt="" @load="imgLoad">
+      <!-- src不能写死，不同的父组件传入的数据格式不同，采用计算属性showImage -->
+        <img :src="showImage" alt="" @load="imgLoad">
         <div class="goods-info">
             <p>{{goodsItem.title}}</p>
             <span class="price">{{goodsItem.price}}</span>
@@ -19,6 +20,12 @@ export default {
                 return {}
             }
         }
+    },
+    computed: {
+      //有的父组件的数据层级格式不同，比如详情页的推荐没有show这一级
+      showImage() {
+        return this.goodsItem.image || this.goodsItem.show.img
+      }
     },
     methods: {
       imgLoad() {
