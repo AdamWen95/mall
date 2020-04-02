@@ -1,4 +1,5 @@
 import { debounce } from './utils';
+import BackTop from 'components/content/backTop/BackTop';
 
 //home和detail都需要使用页面加载完成再刷新scroll事件，代码重复，使用混入技术
 export const itemListenerMixin = {
@@ -18,5 +19,22 @@ export const itemListenerMixin = {
             refresh()
         }
         this.$bus.$on('itemImgLoad', this.itemImgListener)
+    }
+}
+
+//回到顶部功能，home和detail也都要用
+export const backTopMixin = {
+    data() {
+        return {
+            isShowBackTop: false
+        }
+    },
+    components: {
+        BackTop
+    },
+    methods: {
+        backClick() {
+            this.$refs.scroll.scrollTo(0, 0, 500)
+        }
     }
 }

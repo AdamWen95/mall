@@ -23,7 +23,7 @@ import NavBar from 'components/common/navbar/NavBar'
 import TabControl from 'components/content/tabControl/TabControl'
 import GoodsList from 'components/content/goods/GoodsList'
 import Scroll from 'components/common/scroll/Scroll'
-import BackTop from 'components/content/backTop/BackTop'
+// import BackTop from 'components/content/backTop/BackTop'
 
 //导入home的子组件
 import HomeSwiper from './childComps/HomeSwiper'
@@ -33,7 +33,7 @@ import FeatureView from './childComps/FeatureView'
 //导入网络请求等封装好的函数
 import {getHomeMultidata, getHomeGoods} from 'network/home'
 import {debounce} from 'common/utils'
-import {itemListenerMixin} from 'common/mixin'
+import {itemListenerMixin, backTopMixin} from 'common/mixin'
 
 export default {
     name: "Home",
@@ -49,18 +49,18 @@ export default {
             },
             //当前选中的标签
             currentType: 'pop',
-            isShowBackTop: false,
+            // isShowBackTop: false,
             isTabFixed: false,
             tabOffsetTop: 0,
             saveY: 0,
         }
     },
-    mixins: [itemListenerMixin],
+    mixins: [itemListenerMixin, backTopMixin],
     components: {
         NavBar,
         TabControl,
         Scroll,
-        BackTop,
+        // BackTop,
         GoodsList,
         HomeSwiper,
         RecommendView,
@@ -139,9 +139,9 @@ export default {
                 this.$refs.scroll.finishPullUp()
             })
         },
-        backClick() {
-            this.$refs.scroll.scrollTo(0, 0, 500)
-        },
+        // backClick() {
+        //     this.$refs.scroll.scrollTo(0, 0, 500)
+        // },
         contentScroll(position) {
             //1.判断back-top是否显示
             this.isShowBackTop = (-position.y) > 1000;

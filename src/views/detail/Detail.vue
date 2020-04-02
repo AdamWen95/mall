@@ -11,6 +11,8 @@
       <!-- 用goodsList展示推荐数据 -->
       <goods-list :goods="recommends" ref="recommend"></goods-list>
     </scroll>
+    <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
+    <detail-bottom-bar @addCart="addToCart"></detail-bottom-bar>
   </div>
 </template>
 
@@ -22,24 +24,26 @@ import DetailShopInfo from './childComps/DetailShopInfo'
 import DetailGoodsInfo from './childComps/DetailGoodsInfo'
 import DetailParamInfo from './childComps/DetailParamInfo'
 import DetailCommentInfo from './childComps/DetailCommentInfo'
+import DetailBottomBar from './childComps/DetailBottomBar'
 
 import Scroll from 'components/common/scroll/Scroll'
 import GoodsList from 'components/content/goods/GoodsList'
 
 import {getDetail, getRecommend, Goods, Shop, GoodsParam} from 'network/detail'
 import {debounce} from 'common/utils'
-import {itemListenerMixin} from 'common/mixin'
+import {itemListenerMixin, backTopMixin} from 'common/mixin'
 
 export default {
   name: "Detail",
   //混入
-  mixins: [itemListenerMixin],
+  mixins: [itemListenerMixin, backTopMixin],
   data() {
     return {
       iid: null,
       topImages: [],
-      //如果一开始为null，那么因为在子组件中的默认值是{}，会引起报错，因此这边一开始设为空对象
+      //商品数据；如果一开始为null，那么因为在子组件中的默认值是{}，会引起报错，因此这边一开始设为空对象
       goods: {},
+      //商家信息
       shop: {},
       //商品详情数据
       detailInfo: {},
@@ -65,6 +69,7 @@ export default {
     DetailGoodsInfo,
     DetailParamInfo,
     DetailCommentInfo,
+    DetailBottomBar,
     Scroll,
     GoodsList
   },
@@ -110,19 +115,22 @@ export default {
       this.themeTopYs.push(this.$refs.param.$el.offsetTop);
       this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
       this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
+      //给数组的最后加上一个最大值，方便滚动区间的判断
+      this.themeTopYs.push(Number.MAX_VALUE);
     }, 100)
 
     //获取各个标题对应的元素的offsetTop值
     // this.$nextTick(() => {
       //在下一帧获取到数据后，也就是对应的DOM已经被渲染出来的时候获取对应的offsetTop
       //但是图片还没加载完（高度会小于预期高度）
-    //   this.themeTopYs = [];
-    //   this.themeTopYs.push(0);
-    //   this.themeTopYs.push(this.$refs.param.$el.offsetTop);
-    //   this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
-    //   this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
-    // })
+      //this.themeTopYs = [];
+      //this.themeTopYs.push(0);
+      //this.themeTopYs.push(this.$refs.param.$el.offsetTop);
+      //this.themeTopYs.push(this.$refs.comment.$el.offsetTop);
+      //this.themeTopYs.push(this.$refs.recommend.$el.offsetTop);
+    //})
   },
+
   //mounted的时候可能数据还没请求过来，因此可能获取不到部分子组件的根元素$el
   mounted() {
     //和home一样，需要等图片加载完再刷新scroll
@@ -135,9 +143,10 @@ export default {
     this.$bus.$off('itemImgLoad', this.itemImgListener)
   },
   methods: {
+    //监听图片加载完的事件
     imageLoad() {
       this.$refs.scroll.refresh();
-    //在详情图片加载完后，获取各个标题对应的元素的offsetTop值
+      //在详情图片加载完后，获取各个标题对应的元素的offsetTop值
       this.getThemeTopY();
     },
 
@@ -150,16 +159,44 @@ export default {
     contentScroll(position) {
       //1.获取y值，记得负号
       const positionY = -position.y;
-      //2.y值对比
+
       let length = this.themeTopYs.length;
-      for(let i = 0; i < length; i++) {
-        //this.currentIndex !== i是为了不要进行太频繁的操作；四个区间分别对应一个索引，其中最后一个只需要判断是否>=就行
-        if (this.currentIndex !== i && ((i < length - 1 && positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i+1]) || (i === length - 1 && positionY >= this.themeTopYs[i]))) {
-          this.currentIndex = i;
+
+      //2.y值对比方法一：
+      // for(let i = 0; i < length; i++) {
+        //this.currentIndex !== i是为了不要进行太频繁的赋值操作；四个区间分别对应一个索引，其中最后一个只需要判断是否>=就行
+        // if (this.currentIndex !== i && ((i < length - 1 && positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i+1]) || (i === length - 1 && positionY >= this.themeTopYs[i]))) {
+        //   this.currentIndex = i;
           // console.log(this.currentIndex);
+      //     this.$refs.nav.currentIndex = this.currentIndex;
+      //   }
+      // }
+
+      //2.y值对比方法2二：
+      //在最后加一个非常大的值，那么不需要将前三种情况和最后一种分开讨论
+      for(let i = 0; i < length - 1; i++) {
+        if (this.currentIndex !== i && (positionY >= this.themeTopYs[i] && positionY < this.themeTopYs[i+1])) {
+          this.currentIndex = i;
           this.$refs.nav.currentIndex = this.currentIndex;
         }
       }
+
+      //判断back-top是否显示
+      this.isShowBackTop = (-position.y) > 1000;
+    },
+
+    //添加购物车点击事件
+    addToCart() {
+      //1.获取购物车需要展示的信息
+      const product = {};
+      product.iid = this.iid;
+      product.image = this.topImages[0];
+      product.title = this.goods.title;
+      product.desc = this.goods.desc;
+      product.price = this.goods.realPrice;
+
+      //2.将商品添加到购物车
+      this.$store.dispatch('addCart', product)
     }
   }
 }
@@ -187,7 +224,7 @@ export default {
     overflow: hidden; */
     position: absolute;
     top: 44px;
-    bottom: 0;
+    bottom: 49px;
     left: 0;
     right: 0;
   }
