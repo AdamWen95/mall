@@ -13,6 +13,7 @@
     </scroll>
     <back-top @click.native="backClick" v-show="isShowBackTop"></back-top>
     <detail-bottom-bar @addCart="addToCart"></detail-bottom-bar>
+    <!-- <toast :message="message" :show="show"></toast> -->
   </div>
 </template>
 
@@ -32,6 +33,8 @@ import GoodsList from 'components/content/goods/GoodsList'
 import {getDetail, getRecommend, Goods, Shop, GoodsParam} from 'network/detail'
 import {debounce} from 'common/utils'
 import {itemListenerMixin, backTopMixin} from 'common/mixin'
+
+// import Toast from 'components/common/toast/Toast'
 
 export default {
   name: "Detail",
@@ -58,7 +61,9 @@ export default {
       //保存获取themeTopY值的这个函数，因为原函数需要做防抖处理
       getThemeTopY: null,
       //当前高亮的标题索引
-      currentIndex: 0
+      currentIndex: 0,
+      // message: '23333',
+      // show: false
     }
   },
   components: {
@@ -71,7 +76,8 @@ export default {
     DetailCommentInfo,
     DetailBottomBar,
     Scroll,
-    GoodsList
+    GoodsList,
+    // Toast
   },
   created() {
     this.iid = this.$route.params.iid;
@@ -196,7 +202,19 @@ export default {
       product.price = this.goods.realPrice;
 
       //2.将商品添加到购物车
-      this.$store.dispatch('addCart', product)
+      //可以接收到actions里面返回的promise
+      this.$store.dispatch('addCart', product).then(res => {
+        // this.show = true;
+        // this.message = res;
+
+        // setTimeout(() => {
+        //   this.show = false;
+        //   this.message = '';
+        // }, 1500)
+
+        //通过直接调用封装好的插件的方式引入toast，而不是通过子组件的方式，这样能更方便地在多处调用
+        this.$toast.show(res, 2000)
+      })
     }
   }
 }

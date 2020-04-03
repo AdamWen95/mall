@@ -1,7 +1,7 @@
 <template>
   <div class="bottom-bar">
     <div class="check-content">
-      <check-button class="check-button"></check-button>
+      <check-button :is-checked="isSelectAll" class="check-button" @click.native="checkClick"></check-button>
       <span>全选</span>
     </div>
 
@@ -9,7 +9,7 @@
       合计:{{totalPrice}}
     </div>
 
-    <div class="calculate">
+    <div class="calculate" @click="calcClick">
       去计算({{checkedLength}})
     </div>
   </div>
@@ -31,6 +31,26 @@ export default {
     },
     checkedLength() {
       return this.$store.state.cartList.filter(item => item.checked).length
+    },
+    //是否全选：有不选中的item存在那么就是false
+    isSelectAll() {
+      if (this.$store.state.cartList.length === 0) return false;
+      return !this.$store.state.cartList.find(item => !item.checked);
+    }
+  },
+  methods: {
+    checkClick() {
+      if (this.isSelectAll) {
+        this.$store.state.cartList.forEach(item => item.checked = false)
+      } else {
+        this.$store.state.cartList.forEach(item => item.checked = true)
+      }
+      //下面的简化方式不行，因为会和上面的isSelectAll互相影响
+      // this.$store.state.cartList.forEach(item => item.checked = !this.isSelectAll)
+    },
+    calcClick() {
+      //通过$toast来调用自己封装的toast插件
+      this.$toast.show('请选择要购买的商品', 2000)
     }
   }
 }
