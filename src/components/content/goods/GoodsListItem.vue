@@ -22,9 +22,9 @@ export default {
         }
     },
     computed: {
-      //有的父组件的数据层级格式不同，比如详情页的推荐没有show这一级
+      //有的父组件的数据层级格式不同，比如详情页的推荐没有show这一级，分类页直接是img
       showImage() {
-        return this.goodsItem.image || this.goodsItem.show.img
+        return this.goodsItem.img || this.goodsItem.image || this.goodsItem.show.img
       }
     },
     methods: {
