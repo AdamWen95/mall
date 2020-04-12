@@ -1,61 +1,51 @@
 <template>
-  <div class="profile">
-    <nav-bar class="nav-bar">
-      <div slot="center">购物街</div>
-    </nav-bar>
-    <scroll class="scroll-content">
-      <login></login>
-      <money></money>
-      <div class="line"></div>
-      <profile-list></profile-list>
-    </scroll>
+  <div id="profile">
+    <nav-bar class="nav-bar"><div slot="center">我的档案</div></nav-bar>
+    <user-info></user-info>
+    <account-info></account-info>
+    <normal-list-view :list-data="orderList"></normal-list-view>
+    <normal-list-view :list-data="serviceList"></normal-list-view>
   </div>
 </template>
 
 <script>
-import NavBar from "components/common/navbar/NavBar"
-import Scroll from "components/common/scroll/Scroll"
+  import NavBar from 'components/common/navbar/NavBar'
 
-import Login from "./childComps/Login"
-import Money from "./childComps/Money"
-import ProfileList from "./childComps/ProfileList"
+  import UserInfo from './childComps/UserInfo'
+  import AccountInfo from './childComps/AccountInfo'
+  import NormalListView from './childComps/NormalListView'
 
-export default {
+  export default {
     name: "Profile",
     components: {
-      NavBar,
-      Scroll,
-      Login,
-      Money,
-      ProfileList
+    	NavBar,
+      UserInfo,
+      AccountInfo,
+      NormalListView
+    },
+    data() {
+    	return {
+		    orderList: [
+			    {icon: 'message.svg', info: '我的消息'},
+			    {icon: 'pointer.svg', info: '积分商城'},
+			    {icon: 'vip.svg', info: '会员卡'},
+		    ],
+		    serviceList: [
+			    {icon: 'cart.svg', info: '我的购物车'},
+			    {icon: 'shopping.svg', info: '下载购物APP'},
+		    ]
+      }
     }
-}
+  }
 </script>
 
 <style scoped>
-.profile {
-  width: 100%;
-  height: 100%;
-}
+  #profile {
+    background-color: #f2f2f2;
+  }
 
-.nav-bar {
-  font-weight: 600;
-  color: white;
-  background-color: var(--color-tint);
-}
-
-.line {
-  width: 100%;
-  height: 10px;
-  background-color: #eeeeee;
-}
-
-.scroll-content {
-  position: absolute;
-  top: 44px;
-  right: 0;
-  bottom: 49px;
-  left: 0;
-  overflow: hidden;
-}
+  .nav-bar {
+    background-color: var(--color-tint);
+    color: #fff;
+  }
 </style>

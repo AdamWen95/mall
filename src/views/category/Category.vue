@@ -3,7 +3,7 @@
       <!-- 导航栏 -->
       <nav-bar class="nav-bar"><div slot="center">商品分类</div></nav-bar>
       <!-- 侧边栏 -->
-      <slide-bar :slide-bar-list="categoryList"></slide-bar>
+      <slide-bar :slide-bar-list="categoryList" @slideBarItemClick="slideBarItemClick"></slide-bar>
       <!-- 分类内容 -->
       <scroll class="scroll-content" ref="scroll">
         <!-- 分类子数据 -->
@@ -43,7 +43,7 @@ export default {
         currentType: 'pop'
       }
     },
-    //标签页的选择、scroll在图片加载完刷新（防抖）
+    //scroll在图片加载完刷新（防抖）
     mixins: [itemListenerMixin],
     components: {
       NavBar,
@@ -76,7 +76,7 @@ export default {
           // console.log(res.data.category.list);
           this.categoryList = res.data.category.list;
           this.$nextTick(() => {
-            this.getSubcategory(this.categoryList[0].maitKey, 0);
+            this.getSubCategory(this.categoryList[0].maitKey, 0);
             this.getCategoryDetail(this.categoryList[0].miniWallkey, "pop");
             // 初始化push第一个key进去
             // this.keyList.push(this.categoryList[0].maitKey);

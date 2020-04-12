@@ -1,8 +1,8 @@
 <template>
   <div class="slide-bar">
-      <scroll class="slide-bar-height">
+      <scroll class="slide-bar-content">
         <template v-for="(item, index) in slideBarList">
-          <button :class="{active: currrentIndex === index}" :key="index" @click="slideBarItemClick(item, index)" class="slide-bar-item">
+          <button :class="currentIndex === index ? 'active' : ''" @click="slideBarItemClick(item, index)" class="slide-bar-item" :key="index">
             {{item.title}}
           </button>
         </template>
@@ -20,7 +20,7 @@ export default {
   },
   data() {
     return {
-      currrentIndex: 0
+      currentIndex: 0
     }
   },
   props: {
@@ -49,7 +49,7 @@ export default {
   width: 100%;
 }
 
-.slide-bar-height {
+.slide-bar-content {
   position: fixed;
   top: 44px;
   right: 0;
